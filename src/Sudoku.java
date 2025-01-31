@@ -34,6 +34,14 @@ public class Sudoku {
             }
         }
     }
+     
+    public int getTaille() {
+        return taille;
+    }
+
+    public Case getCase(int ligne, int colonne) {
+        return grille[ligne][colonne];
+    }
 
     public void afficher() {
         for (int i = 0; i < taille; i++) {
@@ -131,42 +139,4 @@ public class Sudoku {
         return true;
     }
     
-    public static void main(String[] args) {
-        char[] symboles = {'A', 'B', 'C', 'D'}; 
-        Sudoku sudoku = new Sudoku(4, symboles);
-    
-        // 🟢 Test 1 : Grille vide (valide)
-        System.out.println("Test 1 : Grille vide");
-        sudoku.afficher();
-        System.out.println("Valide ? " + sudoku.estValide() + "\n");
-    
-        // 🟢 Test 2 : Grille correcte
-        sudoku.grille[0][0].setValeur('A');
-        sudoku.grille[0][1].setValeur('B');
-        sudoku.grille[0][2].setValeur('C');
-        sudoku.grille[0][3].setValeur('D');
-        System.out.println("Test 2 : Grille correcte");
-        sudoku.afficher();
-        System.out.println("Valide ? " + sudoku.estValide() + "\n");
-    
-        // 🔴 Test 3 : Grille incorrecte (doublon dans une ligne)
-        sudoku.grille[0][3].setValeur('A'); // Doublon
-        System.out.println("Test 3 : Doublon dans la ligne");
-        sudoku.afficher();
-        System.out.println("Valide ? " + sudoku.estValide() + "\n");
-    
-        // 🔴 Test 4 : Grille incorrecte (doublon dans un bloc)
-        sudoku.grille[0][3].setValeur('D'); // Corriger l'erreur précédente
-        sudoku.grille[1][1].setValeur('A'); // Doublon dans un bloc
-        System.out.println("Test 4 : Doublon dans un bloc");
-        sudoku.afficher();
-        System.out.println("Valide ? " + sudoku.estValide() + "\n");
-    
-        // 🔴 Test 5 : Grille incorrecte (doublon dans une colonne)
-        sudoku.grille[1][1].setValeur('B'); // Corriger l'erreur précédente
-        sudoku.grille[2][1].setValeur('A'); // Doublon dans une colonne
-        System.out.println("Test 5 : Doublon dans une colonne");
-        sudoku.afficher();
-        System.out.println("Valide ? " + sudoku.estValide() + "\n");
-    }
 }
