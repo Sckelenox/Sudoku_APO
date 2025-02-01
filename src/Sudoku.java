@@ -1,142 +1,136 @@
 package src;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class Sudoku {
-    private Case[][] grille;
-    private Bloc[][] blocs;
-    private int taille;
-    private char[] symboles;
+
+    public static final char VIDE = '0'; // Représente une case vide
+    private char[][] grille; // La grille du Sudoku
+    private Set<Character>[][] possibilites; // Liste des possibilités pour chaque case
+    private int taille; // Taille de la grille (par exemple 9x9 ou 4x4)
+    private char[] symboles; // Symboles utilisés (par exemple '1', '2', '3', '4' pour une grille 4x4)
+    private Bloc[][] blocs; // Les blocs du Sudoku
 
     public Sudoku(int taille, char[] symboles) {
-        if (symboles.length != taille) {
-            throw new IllegalArgumentException("Le nombre de symboles doit correspondre à la taille du Sudoku.");
-        }
         this.taille = taille;
         this.symboles = symboles;
-        this.grille = new Case[taille][taille];
+        this.grille = new char[taille][taille];
+        this.possibilites = new Set[taille][taille];
         this.blocs = new Bloc[taille / (int) Math.sqrt(taille)][taille / (int) Math.sqrt(taille)];
 
-        // Initialisation des blocs
-        for (int i = 0; i < blocs.length; i++) {
-            for (int j = 0; j < blocs.length; j++) {
-                blocs[i][j] = new Bloc();
-            }
-        }
-
-        // Initialisation de la grille et assignation aux blocs
+        // Initialisation de la grille avec des cases vides
         for (int i = 0; i < taille; i++) {
             for (int j = 0; j < taille; j++) {
-                grille[i][j] = new Case(symboles);
-                int blocX = i / (int) Math.sqrt(taille);
-                int blocY = j / (int) Math.sqrt(taille);
-                blocs[blocX][blocY].ajouterCase(grille[i][j]);
+                this.grille[i][j] = VIDE;
+                this.possibilites[i][j] = new HashSet<>();
+                for (char c : symboles) {
+                    this.possibilites[i][j].add(c);
+                }
+            }
+        }
+
+        // Initialisation des blocs
+        int blocIndex = 0;
+        for (int i = 0; i < taille / (int) Math.sqrt(taille); i++) {
+            for (int j = 0; j < taille / (int) Math.sqrt(taille); j++) {
+                blocs[i][j] = new Bloc(taille, blocIndex++);
             }
         }
     }
-     
-    public int getTaille() {
-        return taille;
-    }
 
-    public Case getCase(int ligne, int colonne) {
-        return grille[ligne][colonne];
-    }
-
+    // Méthode pour afficher la grille
     public void afficher() {
         for (int i = 0; i < taille; i++) {
             for (int j = 0; j < taille; j++) {
-                System.out.print(grille[i][j].getValeur() + " ");
+                System.out.print(grille[i][j] + " ");
             }
             System.out.println();
         }
     }
 
-    public Set<Character> getPossibilites(int ligne, int colonne) {
-        if (!grille[ligne][colonne].estVide()) {
-            return new HashSet<>();
-        }
-
-        Set<Character> possibilites = new HashSet<>();
-        for (char symbole : symboles) {
-            possibilites.add(symbole);
-        }
-
-        // Exclure les symboles présents dans la ligne et colonne
-        for (int i = 0; i < taille; i++) {
-            possibilites.remove(grille[ligne][i].getValeur());
-            possibilites.remove(grille[i][colonne].getValeur());
-        }
-
-        // Exclure les symboles du bloc
-        int blocX = ligne / (int) Math.sqrt(taille);
-        int blocY = colonne / (int) Math.sqrt(taille);
-        for (char symbole : blocs[blocX][blocY].getPossibilites()) {
-            possibilites.remove(symbole);
-        }
-
-        return possibilites;
-    }
-
-    public boolean remplir() {
+    // Méthode pour vérifier si le Sudoku est rempli
+    public boolean estRempli() {
         for (int i = 0; i < taille; i++) {
             for (int j = 0; j < taille; j++) {
-                if (grille[i][j].estVide()) {
-                    for (char symbole : getPossibilites(i, j)) {
-                        grille[i][j].setValeur(symbole);
-                        if (remplir()) {
-                            return true;
-                        }
-                        grille[i][j].setValeur('.'); // Réinitialisation
-                    }
+                if (grille[i][j] == VIDE) {
                     return false;
                 }
             }
         }
         return true;
     }
+
+    // Méthode pour vérifier si le Sudoku est valide (pas de doublons dans les lignes, colonnes et blocs)
     public boolean estValide() {
-        // Vérifier chaque ligne
         for (int i = 0; i < taille; i++) {
-            if (!estLigneValide(i)) return false;
-        }
-    
-        // Vérifier chaque colonne
-        for (int j = 0; j < taille; j++) {
-            if (!estColonneValide(j)) return false;
-        }
-    
-        // Vérifier chaque bloc
-        int sqrtTaille = (int) Math.sqrt(taille);
-        for (int i = 0; i < sqrtTaille; i++) {
-            for (int j = 0; j < sqrtTaille; j++) {
-                if (!blocs[i][j].estValide()) return false;
-            }
-        }
-    
-        return true; // Si tout est valide
-    }
-    
-    private boolean estLigneValide(int ligne) {
-        Set<Character> vus = new HashSet<>();
-        for (int j = 0; j < taille; j++) {
-            char valeur = grille[ligne][j].getValeur();
-            if (valeur != '.' && !vus.add(valeur)) {
-                return false; // Doublon détecté
+            for (int j = 0; j < taille; j++) {
+                char valeur = grille[i][j];
+                if (valeur != VIDE) {
+                    // Vérifie ligne, colonne et bloc
+                    if (estDansLigne(i, valeur) || estDansColonne(j, valeur) || estDansBloc(i, j, valeur)) {
+                        return false;
+                    }
+                }
             }
         }
         return true;
     }
-    
-    private boolean estColonneValide(int colonne) {
-        Set<Character> vus = new HashSet<>();
+
+    // Méthodes pour vérifier les contraintes de ligne, colonne et bloc
+    private boolean estDansLigne(int ligne, char valeur) {
         for (int i = 0; i < taille; i++) {
-            char valeur = grille[i][colonne].getValeur();
-            if (valeur != '.' && !vus.add(valeur)) {
-                return false; // Doublon détecté
+            if (grille[ligne][i] == valeur) {
+                return true;
             }
         }
-        return true;
+        return false;
     }
-    
+
+    private boolean estDansColonne(int colonne, char valeur) {
+        for (int i = 0; i < taille; i++) {
+            if (grille[i][colonne] == valeur) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean estDansBloc(int ligne, int colonne, char valeur) {
+        int tailleBloc = (int) Math.sqrt(taille);
+        int ligneBloc = (ligne / tailleBloc) * tailleBloc;
+        int colBloc = (colonne / tailleBloc) * tailleBloc;
+        return blocs[ligneBloc / tailleBloc][colBloc / tailleBloc].contientValeur(valeur);
+    }
+
+    // Méthode pour définir une valeur dans la grille
+    public void setCase(int ligne, int colonne, char valeur) {
+        grille[ligne][colonne] = valeur;
+        blocs[ligne / (int) Math.sqrt(taille)][colonne / (int) Math.sqrt(taille)].ajouterValeur(valeur);
+    }
+
+    // Méthode pour récupérer les possibilités d'une case
+    public Set<Character> getPossibilites(int ligne, int colonne) {
+        return possibilites[ligne][colonne];
+    }
+
+    // Méthode pour supprimer une possibilité pour une case
+    public void supprimerPossibilite(int ligne, int colonne, char valeur) {
+        possibilites[ligne][colonne].remove(valeur);
+    }
+
+    // Accesseur à la taille de la grille
+    public int getTaille() {
+        return taille;
+    }
+
+    // Méthode pour vérifier si la grille est valide selon les règles du Sudoku
+    public boolean verifier() {
+        // Il est valide si chaque ligne, colonne et bloc ne contiennent pas de doublons
+        return estValide();
+    }
+
+    public char getCase(int i, int j) {
+        return grille[i][j];
+    }
 }

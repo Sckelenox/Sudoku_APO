@@ -1,44 +1,31 @@
 package src;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class Bloc {
-    private Set<Case> cases; // Ensemble des cases du bloc
+    private int taille; // La taille du Sudoku (par exemple, 9 pour un 9x9)
+    private int indice; // L'indice du bloc (par exemple, 0 pour le premier bloc 3x3)
+    private Set<Character> valeurs; // Ensemble des valeurs présentes dans le bloc
 
-    public Bloc() {
-        this.cases = new HashSet<>();
+    public Bloc(int taille, int indice) {
+        this.taille = taille;
+        this.indice = indice;
+        this.valeurs = new HashSet<>();
     }
 
-    public void ajouterCase(Case c) {
-        cases.add(c);
-    }
-
-    public boolean contient(char symbole) {
-        for (Case c : cases) {
-            if (c.getValeur() == symbole) {
-                return true;
-            }
+    // Ajouter une valeur dans le bloc
+    public boolean ajouterValeur(char valeur) {
+        if (valeurs.contains(valeur)) {
+            return false; // La valeur existe déjà dans le bloc
         }
-        return false;
+        valeurs.add(valeur);
+        return true;
     }
 
-    public Set<Character> getPossibilites() {
-        Set<Character> possibilites = new HashSet<>();
-        for (Case c : cases) {
-            possibilites.addAll(c.getPossibilites());
-        }
-        return possibilites;
+    // Vérifier si une valeur est présente dans le bloc
+    public boolean contientValeur(char valeur) {
+        return valeurs.contains(valeur);
     }
-
-public boolean estValide() {
-    Set<Character> vus = new HashSet<>();
-    for (Case c : cases) {
-        char valeur = c.getValeur();
-        if (valeur != '.' && !vus.add(valeur)) {
-            return false; // Doublon dans le bloc
-        }
-    }
-    return true;
-}
 }
 
