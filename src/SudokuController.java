@@ -35,9 +35,9 @@ public class SudokuController {
             boolean resolu = solveur.resoudre(false, false); // Appelez la méthode appropriée pour résoudre
 
             if (resolu) {
-                JOptionPane.showMessageDialog(view, "✅ Sudoku résolu !");
+                JOptionPane.showMessageDialog(view, " Sudoku résolu !");
             } else {
-                JOptionPane.showMessageDialog(view, "❌ Impossible de résoudre ce Sudoku.");
+                JOptionPane.showMessageDialog(view, " Impossible de résoudre ce Sudoku.");
             }
 
             // Mettre à jour l'affichage de la grille
@@ -78,7 +78,7 @@ public class SudokuController {
             // Afficher la grille générée dans la vue
             view.afficherGrille(getModelGrille());
 
-            JOptionPane.showMessageDialog(view, "✅ Grille générée avec succès !");
+            JOptionPane.showMessageDialog(view, " Grille générée avec succès !");
         });
     }
 

@@ -23,7 +23,7 @@ public class Solveur {
         appliquerContraintes();
 
         if (sudoku.estRempli()) {
-            logs.add("✅ Sudoku résolu par les règles uniquement.");
+            logs.add(" Sudoku résolu par les règles uniquement.");
             return true;
         }
 
@@ -53,7 +53,7 @@ public class Solveur {
 
             if (avecAffichage) {
                 sudoku.afficher();
-                logs.add("🔄 Application des règles, mise à jour de la grille.");
+                logs.add(" Application des règles, mise à jour de la grille.");
             }
         }
 
@@ -146,7 +146,7 @@ public class Solveur {
     private boolean backtracking(boolean avecAffichage) {
         int[] caseVide = trouverCaseVide();
         if (caseVide == null) {
-            logs.add("✅ Sudoku résolu !");
+            logs.add("Sudoku résolu !");
             return true;
         }
 
