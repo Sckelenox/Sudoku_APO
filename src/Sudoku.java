@@ -78,7 +78,7 @@ public class Sudoku {
     }
 
     // Méthodes pour vérifier les contraintes de ligne, colonne et bloc
-    private boolean estDansLigne(int ligne, char valeur) {
+    public boolean estDansLigne(int ligne, char valeur) {
         for (int i = 0; i < taille; i++) {
             if (grille[ligne][i] == valeur) {
                 return true;
@@ -87,7 +87,7 @@ public class Sudoku {
         return false;
     }
 
-    private boolean estDansColonne(int colonne, char valeur) {
+    public boolean estDansColonne(int colonne, char valeur) {
         for (int i = 0; i < taille; i++) {
             if (grille[i][colonne] == valeur) {
                 return true;
@@ -96,7 +96,7 @@ public class Sudoku {
         return false;
     }
 
-    private boolean estDansBloc(int ligne, int colonne, char valeur) {
+    public boolean estDansBloc(int ligne, int colonne, char valeur) {
         int tailleBloc = (int) Math.sqrt(taille);
         int ligneBloc = (ligne / tailleBloc) * tailleBloc;
         int colBloc = (colonne / tailleBloc) * tailleBloc;
@@ -115,8 +115,9 @@ public class Sudoku {
     }
 
     // Méthode pour supprimer une possibilité pour une case
-    public void supprimerPossibilite(int ligne, int colonne, char valeur) {
+    public boolean supprimerPossibilite(int ligne, int colonne, char valeur) {
         possibilites[ligne][colonne].remove(valeur);
+        return false;
     }
 
     // Accesseur à la taille de la grille

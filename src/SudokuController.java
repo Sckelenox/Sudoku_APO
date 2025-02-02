@@ -35,7 +35,8 @@ public class SudokuController {
                     }
                 }
                 // Tenter de résoudre le sudoku (par exemple, uniquement par déduction ou backtracking)
-                boolean resolu = solveur.resoudre(false);
+                boolean resolu = solveur.resoudre(false, false);
+
                 if (resolu) {
                     JOptionPane.showMessageDialog(view, "✅ Sudoku résolu !");
                 } else {

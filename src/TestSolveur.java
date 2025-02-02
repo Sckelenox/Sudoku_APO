@@ -14,7 +14,8 @@ public class TestSolveur {
         System.out.println("Grille avant résolution (testSudokuResolu4x4) :");
         sudoku.afficher(); // Affiche avant la résolution
 
-        boolean resolu = solveur.resoudre(true);
+        boolean resolu = solveur.resoudre(true, false);
+
 
         System.out.println("Grille après résolution (testSudokuResolu4x4) :");
         sudoku.afficher(); // Affiche après la résolution
@@ -53,7 +54,8 @@ public class TestSolveur {
         System.out.println("Grille avant résolution (testSudokuPartiellementRempli) :");
         sudoku.afficher(); // Affiche avant la résolution
 
-        boolean resolu = solveur.resoudre(true);
+        boolean resolu = solveur.resoudre(true, false);
+
 
         System.out.println("Grille après résolution (testSudokuPartiellementRempli) :");
         sudoku.afficher(); // Affiche après la résolution
@@ -77,7 +79,7 @@ public class TestSolveur {
         System.out.println("Grille avant backtracking (testBacktrackingNecessaire) :");
         sudoku.afficher(); // Affiche avant le backtracking
 
-        boolean resolu = solveur.resoudre(true);
+        boolean resolu = solveur.resoudre(true, false);
 
         System.out.println("Grille après backtracking (testBacktrackingNecessaire) :");
         sudoku.afficher(); // Affiche après le backtracking
