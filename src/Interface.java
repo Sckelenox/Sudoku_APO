@@ -1,11 +1,13 @@
 package src;
 
+import java.util.List;
 import java.util.Scanner;
 
 public class Interface {
     private Scanner scanner = new Scanner(System.in);
     private Sudoku sudoku; // La grille stockée en mémoire
     private Solveur solveur; // Le solveur pour résoudre le sudoku
+    private Generateur generateur;
 
     public Interface() {
         this.sudoku = null;
@@ -163,45 +165,24 @@ public class Interface {
         System.out.println("Sélectionnez le niveau de difficulté (1 = Facile, 2 = Moyen, 3 = Difficile) :");
         int niveau = scanner.nextInt();
 
+        // Créer une instance de Generateur pour générer la grille complète
+        Generateur generateur = new Generateur(sudoku.getTaille(), genererSymboles(sudoku.getTaille()));
+
         // Générer une grille complète (résolue)
-        Sudoku nouvelleGrille = genererGrilleComplete(sudoku.getTaille());
+        Sudoku grilleComplete = generateur.genererGrilleComplete();
 
-        // Rendre la grille résoluble selon le niveau de difficulté
-        retirerChiffres(nouvelleGrille, niveau);
+        // Générer une grille jouable à partir de la grille complète en fonction du niveau de difficulté
+        Sudoku grilleJouable = generateur.genererGrilleJouable(grilleComplete, niveau);
 
-        sudoku = nouvelleGrille;  // Remplacer la grille actuelle par la nouvelle générée
+        // Assigner la grille jouable générée à la variable sudoku
+        sudoku = grilleJouable;
+
         System.out.println("✅ Grille générée avec succès !");
         afficherGrille();  // Afficher la grille générée
     }
 
-    private Sudoku genererGrilleComplete(int taille) {
-        Sudoku sudokuComplete = new Sudoku(taille, genererSymboles(taille));
-        Solveur solveur = new Solveur(sudokuComplete);
-        solveur.resoudre(false, true);  // Résoudre la grille en utilisant les règles uniquement
-        return sudokuComplete;
-    }
 
-    private void retirerChiffres(Sudoku sudoku, int niveau) {
-        int casesARetirer = 0;
 
-        switch (niveau) {
-            case 1 -> casesARetirer = (int) (sudoku.getTaille() * sudoku.getTaille() * 0.3);  // Facile - 30% des cases
-            case 2 -> casesARetirer = (int) (sudoku.getTaille() * sudoku.getTaille() * 0.5);  // Moyen - 50% des cases
-            case 3 -> casesARetirer = (int) (sudoku.getTaille() * sudoku.getTaille() * 0.7);  // Difficile - 70% des cases
-            default -> System.out.println("Niveau invalide. Utilisation du niveau moyen.");
-        }
-
-        int casesRetirees = 0;
-        while (casesRetirees < casesARetirer) {
-            int ligne = (int) (Math.random() * sudoku.getTaille());
-            int colonne = (int) (Math.random() * sudoku.getTaille());
-
-            if (sudoku.getCase(ligne, colonne) != Sudoku.VIDE) {
-                sudoku.setCase(ligne, colonne, Sudoku.VIDE);  // Retirer le chiffre
-                casesRetirees++;
-            }
-        }
-    }
 
     private char[] genererSymboles(int taille) {
         char[] symboles = new char[taille];

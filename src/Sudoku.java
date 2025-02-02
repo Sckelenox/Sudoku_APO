@@ -5,12 +5,17 @@ import java.util.Set;
 
 public class Sudoku {
 
-    public static final char VIDE = '0'; // Représente une case vide
+    public static final char VIDE = '.'; // Représente une case vide
     private char[][] grille; // La grille du Sudoku
     private Set<Character>[][] possibilites; // Liste des possibilités pour chaque case
     private int taille; // Taille de la grille (par exemple 9x9 ou 4x4)
     private char[] symboles; // Symboles utilisés (par exemple '1', '2', '3', '4' pour une grille 4x4)
     private Bloc[][] blocs; // Les blocs du Sudoku
+    // Méthode pour récupérer la grille complète
+    public char[][] getGrille() {
+        return grille;
+    }
+
 
     public Sudoku(int taille, char[] symboles) {
         this.taille = taille;
@@ -133,5 +138,10 @@ public class Sudoku {
 
     public char getCase(int i, int j) {
         return grille[i][j];
+    }
+
+    // Méthode pour obtenir les symboles
+    public char[] getSymboles() {
+        return symboles; // Retourne le tableau des symboles
     }
 }
