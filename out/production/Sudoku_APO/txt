@@ -1,0 +1,11 @@
+Grille Sudoku :
+H . . D 
+. . . . 
+. . . . 
+. . . . 
+
+Méthode de résolution : REGLES+BACKTRACKING
+
+Logs de la résolution :
+
+États intermédiaires de la grille :

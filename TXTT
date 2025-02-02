@@ -1,0 +1,17 @@
+Grille Sudoku :
+2 1 4 3 
+4 3 1 2 
+3 4 2 1 
+1 2 3 4 
+
+Méthode de résolution : REGLES+BACKTRACKING
+
+Logs de la résolution :
+Début de la résolution...
+Application des contraintes de ligne, colonne et bloc...
+✅ Sudoku résolu par les règles uniquement.
+
+États intermédiaires de la grille :
+Début de la résolution...
+Application des contraintes de ligne, colonne et bloc...
+✅ Sudoku résolu par les règles uniquement.
