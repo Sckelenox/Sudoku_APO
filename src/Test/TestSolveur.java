@@ -1,6 +1,9 @@
-package src;
+package src.Test;
 
 import org.junit.jupiter.api.Test;
+import src.Solveur;
+import src.Sudoku;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class TestSolveur {

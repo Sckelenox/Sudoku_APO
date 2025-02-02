@@ -105,7 +105,45 @@ public class Sudoku {
         int tailleBloc = (int) Math.sqrt(taille);
         int ligneBloc = (ligne / tailleBloc) * tailleBloc;
         int colBloc = (colonne / tailleBloc) * tailleBloc;
-        return blocs[ligneBloc / tailleBloc][colBloc / tailleBloc].contientValeur(valeur);
+        for (int i = ligneBloc; i < ligneBloc + tailleBloc; i++) {
+            for (int j = colBloc; j < colBloc + tailleBloc; j++) {
+                if (grille[i][j] == valeur) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    public void updatePossibilites(int ligne, int colonne, char valeur) {
+        // Supprimer la valeur des possibilités de la ligne, colonne et bloc
+        for (int i = 0; i < taille; i++) {
+            possibilites[ligne][i].remove(valeur);  // Enlever la valeur de la ligne
+            possibilites[i][colonne].remove(valeur);  // Enlever la valeur de la colonne
+        }
+        int tailleBloc = (int) Math.sqrt(taille);
+        int ligneBloc = (ligne / tailleBloc) * tailleBloc;
+        int colBloc = (colonne / tailleBloc) * tailleBloc;
+        for (int i = ligneBloc; i < ligneBloc + tailleBloc; i++) {
+            for (int j = colBloc; j < colBloc + tailleBloc; j++) {
+                possibilites[i][j].remove(valeur);  // Enlever la valeur du bloc
+            }
+        }
+    }
+
+    public void restorePossibilites(int ligne, int colonne, char valeur) {
+        for (int i = 0; i < taille; i++) {
+            possibilites[ligne][i].add(valeur);
+            possibilites[i][colonne].add(valeur);
+        }
+
+        int tailleBloc = (int) Math.sqrt(taille);
+        int ligneBloc = (ligne / tailleBloc) * tailleBloc;
+        int colBloc = (colonne / tailleBloc) * tailleBloc;
+        for (int i = ligneBloc; i < ligneBloc + tailleBloc; i++) {
+            for (int j = colBloc; j < colBloc + tailleBloc; j++) {
+                possibilites[i][j].add(valeur);
+            }
+        }
     }
 
     // Méthode pour définir une valeur dans la grille

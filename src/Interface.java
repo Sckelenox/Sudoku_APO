@@ -25,21 +25,25 @@ public class Interface {
         while (continuer) {
             System.out.println("\n===== MENU SUDOKU (Mode Texte) =====");
             System.out.println("1. Entrer une grille à résoudre");
-            System.out.println("2. Choisir la méthode de résolution");
-            System.out.println("3. Afficher la grille");
-            System.out.println("4. Résoudre le Sudoku");
-            System.out.println("5. Générer une grille à résoudre");
-            System.out.println("6. Quitter le mode texte");
+            System.out.println("2. Charger une grille depuis un fichier");
+            System.out.println("3. Choisir la méthode de résolution");
+            System.out.println("4. Afficher la grille");
+            System.out.println("5. Résoudre le Sudoku");
+            System.out.println("6. Sauvegarder la résolution dans un fichier");
+            System.out.println("7. Générer une grille à résoudre");
+            System.out.println("8. Quitter le mode texte");
             System.out.print("Choisissez une option : ");
 
             int choix = scanner.nextInt();
             switch (choix) {
                 case 1 -> entrerGrille();
-                case 2 -> choisirMethodeResolution();
-                case 3 -> afficherGrille();
-                case 4 -> resoudreSudoku();
-                case 5 -> genererGrille();
-                case 6 -> continuer = false;
+                case 2 -> chargerDepuisFichier();
+                case 3 -> choisirMethodeResolution();
+                case 4 -> afficherGrille();
+                case 5 -> resoudreSudoku();
+                case 6 -> sauvegarderResolution();
+                case 7 -> genererGrille();
+                case 8 -> continuer = false;
                 default -> System.out.println("Option invalide.");
             }
         }
@@ -69,8 +73,28 @@ public class Interface {
             }
         }
 
-        System.out.println("✅ Grille enregistrée avec succès !");
+        System.out.println(" Grille enregistrée avec succès !");
         solveur = new Solveur(sudoku); // Instantiation du solveur avec la grille
+    }
+
+    public void chargerDepuisFichier() {
+        System.out.println("Entrez le chemin du fichier de la grille : ");
+        String chemin = scanner.next();
+        sudoku = GestionFichier.chargerGrilleDepuisFichier(chemin);
+        if (sudoku != null) {
+            solveur = new Solveur(sudoku);
+            System.out.println("Grille chargée avec succès !");
+        } else {
+            System.out.println(" Erreur lors du chargement de la grille.");
+        }
+    }
+
+    public void afficherGrille() {
+        if (sudoku == null) {
+            System.out.println(" Aucune grille disponible !");
+            return;
+        }
+        sudoku.afficher();
     }
 
     public void choisirMethodeResolution() {
@@ -89,96 +113,82 @@ public class Interface {
         }
     }
 
-    public void afficherGrille() {
-        if (sudoku == null) {
-            System.out.println("❌ Aucune grille disponible !");
-            return;
-        }
-        sudoku.afficher();
-    }
-
     public void resoudreSudoku() {
         if (sudoku == null) {
-            System.out.println("❌ Aucune grille disponible !");
+            System.out.println(" Aucune grille disponible !");
             return;
         }
 
-        System.out.println("\n✅ Résolution en cours...");
+        System.out.println("\n Résolution en cours...");
         solveur.resoudre(true, true); // Résolution avec affichage et règles uniquement
 
         if (sudoku.estRempli()) {
-            System.out.println("\n✅ Sudoku résolu !");
+            System.out.println("\n Sudoku résolu !");
         } else {
-            System.out.println("\n❌ Sudoku non résolu uniquement par déduction.");
+            System.out.println("\n Sudoku non résolu uniquement par déduction.");
         }
         sudoku.afficher();
     }
 
     public void resoudreAvecRegles() {
         if (sudoku == null) {
-            System.out.println("❌ Aucune grille disponible !");
+            System.out.println(" Aucune grille disponible !");
             return;
         }
 
-        System.out.println("\n=== Résolution par règles uniquement ===");
         solveur.resoudre(true, true); // Résolution par règles uniquement
-
-        if (sudoku.estRempli()) {
-            System.out.println("\n✅ Sudoku résolu avec les règles !");
-        } else {
-            System.out.println("\n❌ Sudoku non résolu uniquement par déduction.");
-        }
         sudoku.afficher();
     }
 
     public void resoudreAvecBacktracking() {
         if (sudoku == null) {
-            System.out.println("❌ Aucune grille disponible !");
+            System.out.println(" Aucune grille disponible !");
             return;
         }
 
-        System.out.println("\n=== Résolution par backtracking ===");
         solveur.resoudre(true, false); // Résolution par backtracking uniquement
-
-        if (sudoku.estRempli()) {
-            System.out.println("\n✅ Sudoku résolu avec backtracking !");
-        } else {
-            System.out.println("\n❌ Sudoku non résolu par backtracking.");
-        }
         sudoku.afficher();
     }
 
     public void resoudreMixte() {
         if (sudoku == null) {
-            System.out.println("❌ Aucune grille disponible !");
+            System.out.println(" Aucune grille disponible !");
             return;
         }
 
-        System.out.println("\n=== Résolution mixte (règles + backtracking) ===");
-        solveur.resoudre(true, true); // Résolution par règles d'abord
+        solveur.resoudre(true, true); // Règles en premier
         if (!sudoku.estRempli()) {
-            solveur.resoudre(true, false); // Backtracking si la grille n'est pas résolue
+            solveur.resoudre(true, false); // Puis backtracking si besoin
         }
+        sudoku.afficher();
     }
 
     public void genererGrille() {
         System.out.println("Sélectionnez le niveau de difficulté (1 = Facile, 2 = Moyen, 3 = Difficile) :");
         int niveau = scanner.nextInt();
 
-        // Créer une instance de Generateur pour générer la grille complète
         Generateur generateur = new Generateur(sudoku.getTaille(), genererSymboles(sudoku.getTaille()));
 
-        // Générer une grille complète (résolue)
         Sudoku grilleComplete = generateur.genererGrilleComplete();
-
-        // Générer une grille jouable à partir de la grille complète en fonction du niveau de difficulté
         Sudoku grilleJouable = generateur.genererGrilleJouable(grilleComplete, niveau);
 
-        // Assigner la grille jouable générée à la variable sudoku
         sudoku = grilleJouable;
 
-        System.out.println("✅ Grille générée avec succès !");
-        afficherGrille();  // Afficher la grille générée
+        System.out.println(" Grille générée avec succès !");
+        afficherGrille();
+    }
+
+    public void sauvegarderResolution() {
+        if (sudoku == null) {
+            System.out.println(" Aucune grille disponible à sauvegarder !");
+            return;
+        }
+
+        System.out.println("Entrez le nom du fichier pour sauvegarder la résolution : ");
+        String fichier = scanner.next();
+
+        // Sauvegarder la grille, la méthode de résolution et les logs dans le fichier
+        GestionFichier.sauvegarderGrilleDansFichier(sudoku, "REGLES+BACKTRACKING", solveur.getLogs(), fichier);
     }
 
 

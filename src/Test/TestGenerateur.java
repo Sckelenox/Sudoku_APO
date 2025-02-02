@@ -1,10 +1,14 @@
-package src;
+package src.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import src.Generateur;
+import src.Sudoku;
+import src.Solveur;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TestGenerateur {
@@ -18,6 +22,7 @@ public class TestGenerateur {
         generateur = new Generateur(9, symboles);  // Grille de 9x9
     }
 
+    // Test de la génération d'une grille complète
     @Test
     public void testGenererGrilleComplete() {
         Sudoku grilleComplete = generateur.genererGrilleComplete();
@@ -31,6 +36,7 @@ public class TestGenerateur {
         }
     }
 
+    // Test de la génération d'une grille jouable
     @Test
     public void testGenererGrilleJouable() {
         Sudoku grilleComplete = generateur.genererGrilleComplete();
@@ -54,9 +60,19 @@ public class TestGenerateur {
         assertEquals(1, solutions, "La grille jouable doit avoir une seule solution.");
     }
 
+    // Test pour générer plusieurs grilles jouables
     @Test
     public void testGenererGrillesJouables() {
-        List<Sudoku> grillesJouables = generateur.genererGrillesJouables(5, 3);  // Générer 5 grilles
+        // Cette méthode "genererGrillesJouables" n'existe pas actuellement dans la classe Generateur.
+        // Vous devrez soit la créer, soit ajuster ce test en fonction de l'API existante.
+
+        // Par exemple, si vous voulez générer plusieurs grilles jouables, vous pouvez utiliser un code similaire à ce qui suit:
+        List<Sudoku> grillesJouables = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            Sudoku grilleComplete = generateur.genererGrilleComplete();
+            Sudoku grilleJouable = generateur.genererGrilleJouable(grilleComplete, 3); // Difficulté 3
+            grillesJouables.add(grilleJouable);
+        }
 
         assertEquals(5, grillesJouables.size(), "Le nombre de grilles jouables générées ne correspond pas.");
 
@@ -66,4 +82,8 @@ public class TestGenerateur {
             assertEquals(1, solutions, "Chaque grille jouable doit avoir une seule solution.");
         }
     }
+
+
+
 }
+

@@ -35,7 +35,7 @@ public class Main {
             }
         }
 
-        System.out.println("👋 Programme terminé !");
+        System.out.println(" Programme terminé !");
     }
 
     private static void lancerModeGraphique() {

@@ -1,62 +1,63 @@
 package src;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class Solveur {
 
     private Sudoku sudoku;
+    private List<String> logs; // Liste pour stocker les logs
 
     public Solveur(Sudoku sudoku) {
         this.sudoku = sudoku;
+        this.logs = new ArrayList<>();
     }
 
     // Méthode pour résoudre le Sudoku
     public boolean resoudre(boolean avecAffichage, boolean avecRèglesUniquement) {
-        // Applique les contraintes initiales
+        logs.clear(); // Réinitialise les logs
+        logs.add("Début de la résolution...");
+
         appliquerContraintes();
 
-        // Si la grille est déjà remplie, renvoie true
         if (sudoku.estRempli()) {
-            System.out.println("✅ Sudoku déjà résolu par les règles.");
+            logs.add("✅ Sudoku résolu par les règles uniquement.");
             return true;
         }
 
-        // Si on ne veut utiliser que les règles, on applique les règles et vérifie si la grille est résolue
         if (avecRèglesUniquement) {
             return appliquerRèglesUniquement(avecAffichage);
         }
 
-        // Sinon, on utilise le backtracking
         return backtracking(avecAffichage);
     }
 
-    // Applique les contraintes de base : lignes, colonnes et blocs
+    // Applique les contraintes de base
     public void appliquerContraintes() {
+        logs.add("Application des contraintes de ligne, colonne et bloc...");
         appliquerContrainteLigne();
         appliquerContrainteColonne();
         appliquerContrainteBloc();
     }
 
-    // Applique les règles de base uniquement, sans backtracking
     private boolean appliquerRèglesUniquement(boolean avecAffichage) {
         boolean changements = true;
         while (changements) {
             changements = false;
 
-            // Appliquer les contraintes à chaque itération et vérifier s'il y a des changements
             changements |= appliquerContrainteLigne();
             changements |= appliquerContrainteColonne();
             changements |= appliquerContrainteBloc();
 
-            // Affichage des étapes si demandé
             if (avecAffichage) {
                 sudoku.afficher();
-                System.out.println("🔄 Application des règles, mise à jour de la grille.");
+                logs.add("🔄 Application des règles, mise à jour de la grille.");
             }
         }
 
-        // Retourne true si le Sudoku est résolu après application des règles
+        logs.add("Résolution par les règles terminée.");
         return sudoku.estRempli();
     }
 
@@ -72,7 +73,6 @@ public class Solveur {
                 }
             }
 
-            // Parcourt de nouveau la ligne pour supprimer les possibilités
             for (int j = 0; j < sudoku.getTaille(); j++) {
                 if (sudoku.getCase(i, j) == Sudoku.VIDE) {
                     for (char c : chiffresUtilises) {
@@ -98,7 +98,6 @@ public class Solveur {
                 }
             }
 
-            // Parcourt de nouveau la colonne pour supprimer les possibilités
             for (int i = 0; i < sudoku.getTaille(); i++) {
                 if (sudoku.getCase(i, j) == Sudoku.VIDE) {
                     for (char c : chiffresUtilises) {
@@ -122,7 +121,6 @@ public class Solveur {
                 int colBloc = (j / tailleBloc) * tailleBloc;
                 Set<Character> chiffresUtilises = new HashSet<>();
 
-                // Vérifie les chiffres dans le bloc
                 for (int m = ligneBloc; m < ligneBloc + tailleBloc; m++) {
                     for (int n = colBloc; n < colBloc + tailleBloc; n++) {
                         char valeur = sudoku.getCase(m, n);
@@ -132,7 +130,6 @@ public class Solveur {
                     }
                 }
 
-                // Supprime les possibilités dans le bloc
                 if (sudoku.getCase(i, j) == Sudoku.VIDE) {
                     for (char c : chiffresUtilises) {
                         if (sudoku.supprimerPossibilite(i, j, c)) {
@@ -145,55 +142,40 @@ public class Solveur {
         return changements;
     }
 
-    // Algorithme de Backtracking pour résoudre le Sudoku
+    // Algorithme de Backtracking
     private boolean backtracking(boolean avecAffichage) {
-        // Trouve la première case vide
         int[] caseVide = trouverCaseVide();
         if (caseVide == null) {
-            return true; // Si aucune case vide, la grille est résolue
+            logs.add("✅ Sudoku résolu !");
+            return true;
         }
 
         int ligne = caseVide[0];
         int colonne = caseVide[1];
 
-        // Log de l'état actuel
-        if (avecAffichage) {
-            System.out.println("Tentative de remplir la case (" + ligne + ", " + colonne + ")");
-            System.out.println("Possibilités : " + sudoku.getPossibilites(ligne, colonne));
-        }
+        logs.add("Tentative de remplir la case (" + ligne + ", " + colonne + ")");
 
-        // Essaye chaque possibilité
         for (char valeur : sudoku.getPossibilites(ligne, colonne)) {
-            if (estValide(ligne, colonne, valeur)) {
+            if (estValide(sudoku, ligne, colonne, valeur)) {
                 sudoku.setCase(ligne, colonne, valeur);
+                logs.add("Placé " + valeur + " à (" + ligne + ", " + colonne + ")");
 
-                // Affichage si demandé
-                if (avecAffichage) {
-                    System.out.println("Placé " + valeur + " à (" + ligne + ", " + colonne + ")");
-                    sudoku.afficher();
-                }
-
-                // Résolution récursive
                 if (backtracking(avecAffichage)) {
                     return true;
                 }
 
-                // Si ça échoue, réinitialise la case
                 sudoku.setCase(ligne, colonne, Sudoku.VIDE);
-                if (avecAffichage) {
-                    System.out.println("Retour sur trace, réinitialisation de la case (" + ligne + ", " + colonne + ")");
-                }
+                logs.add("⏪ Retour en arrière, réinitialisation de (" + ligne + ", " + colonne + ")");
             }
         }
-        return false; // Retourne false si aucune solution n'est trouvée
+        return false;
     }
 
-    // Vérifie si une valeur est valide à un emplacement donné
-    private boolean estValide(int ligne, int colonne, char valeur) {
+    // Méthodes auxiliaires
+    private boolean estValide(Sudoku sudoku, int ligne, int colonne, char valeur) {
         return !estDansLigne(ligne, valeur) && !estDansColonne(colonne, valeur) && !estDansBloc(ligne, colonne, valeur);
     }
 
-    // Vérifie si une valeur existe déjà dans la ligne
     private boolean estDansLigne(int ligne, char valeur) {
         for (int i = 0; i < sudoku.getTaille(); i++) {
             if (sudoku.getCase(ligne, i) == valeur) {
@@ -203,7 +185,6 @@ public class Solveur {
         return false;
     }
 
-    // Vérifie si une valeur existe déjà dans la colonne
     private boolean estDansColonne(int colonne, char valeur) {
         for (int i = 0; i < sudoku.getTaille(); i++) {
             if (sudoku.getCase(i, colonne) == valeur) {
@@ -213,7 +194,6 @@ public class Solveur {
         return false;
     }
 
-    // Vérifie si une valeur existe dans le bloc
     private boolean estDansBloc(int ligne, int colonne, char valeur) {
         int tailleBloc = (int) Math.sqrt(sudoku.getTaille());
         int ligneBloc = (ligne / tailleBloc) * tailleBloc;
@@ -228,55 +208,56 @@ public class Solveur {
         return false;
     }
 
-    // Trouve la première case vide
     private int[] trouverCaseVide() {
         for (int i = 0; i < sudoku.getTaille(); i++) {
             for (int j = 0; j < sudoku.getTaille(); j++) {
                 if (sudoku.getCase(i, j) == Sudoku.VIDE) {
-                    return new int[] {i, j};
+                    return new int[]{i, j};
                 }
             }
         }
-        return null; // Si aucune case vide n'est trouvée
+        return null;
     }
 
-    // Compte le nombre de solutions possibles (utile pour vérifier si un Sudoku est bien posé)
+    // Retourne les logs
+    public List<String> getLogs() {
+        return logs;
+    }
     public int compterSolutions() {
-        int[] count = {0}; // Utilisation d'un tableau pour passer par référence
-        compterSolutionsBacktrack(0, 0, count);
-        return count[0];
+        return compterSolutionsRecursive(sudoku, 0, 0);
     }
 
-    // Backtracking pour compter les solutions possibles
-    private void compterSolutionsBacktrack(int ligne, int colonne, int[] count) {
+    private int compterSolutionsRecursive(Sudoku sudoku, int ligne, int col) {
+        // Si nous avons atteint la fin de la grille (toutes les cases sont remplies)
         if (ligne == sudoku.getTaille()) {
-            count[0]++;
-            return;
+            return 1;  // Une solution trouvée
         }
 
-        if (colonne == sudoku.getTaille()) {
-            compterSolutionsBacktrack(ligne + 1, 0, count);
-            return;
+        // Si nous avons rempli une ligne, passons à la ligne suivante
+        if (col == sudoku.getTaille()) {
+            return compterSolutionsRecursive(sudoku, ligne + 1, 0);
         }
 
-        if (sudoku.getCase(ligne, colonne) != Sudoku.VIDE) {
-            compterSolutionsBacktrack(ligne, colonne + 1, count);
-            return;
+        // Si la case est déjà remplie, passez à la case suivante
+        if (sudoku.getCase(ligne, col) != Sudoku.VIDE) {
+            return compterSolutionsRecursive(sudoku, ligne, col + 1);
         }
 
-        for (char valeur : sudoku.getPossibilites(ligne, colonne)) {
-            if (!estValide(ligne, colonne, valeur)) {
-                continue;
+        int totalSolutions = 0;
+
+        // Essayer toutes les valeurs possibles dans la case vide
+        for (char valeur = '1'; valeur <= '9'; valeur++) {
+            if (estValide(sudoku, ligne, col, valeur)) {
+                sudoku.setCase(ligne, col, valeur);  // Placer la valeur dans la case
+
+                // Appel récursif pour la prochaine case
+                totalSolutions += compterSolutionsRecursive(sudoku, ligne, col + 1);
+
+                sudoku.setCase(ligne, col, Sudoku.VIDE);  // Retour en arrière (backtrack)
             }
-
-            sudoku.setCase(ligne, colonne, valeur);
-            compterSolutionsBacktrack(ligne, colonne + 1, count);
-            sudoku.setCase(ligne, colonne, Sudoku.VIDE); // Annule la tentative
-
-            if (count[0] > 1) { // Si plus d'une solution trouvée, on arrête
-                return;
-            }
         }
+
+        return totalSolutions;
     }
 }
 
