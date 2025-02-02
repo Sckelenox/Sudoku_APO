@@ -190,6 +190,8 @@ public class Solveur {
         }
         return null; // Si aucune case vide n'est trouvée
     }
+
+
 }
 
 

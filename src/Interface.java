@@ -1,19 +1,31 @@
 package src;
 
+import src.Sudoku;
+
 import java.util.Scanner;
 
 public class Interface {
     private Scanner scanner = new Scanner(System.in);
+    private Sudoku sudoku; // La grille stockée en mémoire
+
+    public Interface() {
+        this.sudoku = null;
+    }
+
+    public Sudoku lancer() {
+        afficherMenu();
+        return sudoku; // On retourne la grille pour la récupérer en mode graphique
+    }
 
     public void afficherMenu() {
         boolean continuer = true;
 
         while (continuer) {
-            System.out.println("\n===== MENU SUDOKU =====");
+            System.out.println("\n===== MENU SUDOKU (Mode Texte) =====");
             System.out.println("1. Entrer une grille");
             System.out.println("2. Afficher la grille");
             System.out.println("3. Résoudre le Sudoku");
-            System.out.println("4. Quitter");
+            System.out.println("4. Quitter le mode texte");
             System.out.print("Choisissez une option : ");
 
             int choix = scanner.nextInt();
@@ -28,17 +40,16 @@ public class Interface {
     }
 
     public void entrerGrille() {
-        System.out.println("Entrez la taille de la grille (par exemple 4 pour une grille 4x4) :");
+        System.out.println("Entrez la taille de la grille (ex: 4 pour une grille 4x4) :");
         int taille = scanner.nextInt();
         char[] symboles = new char[taille];
 
-        // Entrer les symboles utilisés pour le sudoku
         for (int i = 0; i < taille; i++) {
-            System.out.print("Entrez le symbole pour le numéro " + (i + 1) + " : ");
+            System.out.print("Entrez le symbole pour " + (i + 1) + " : ");
             symboles[i] = scanner.next().charAt(0);
         }
 
-        Sudoku sudoku = new Sudoku(taille, symboles);
+        sudoku = new Sudoku(taille, symboles);
 
         System.out.println("Entrez la grille ligne par ligne (utilisez '0' pour les cases vides) :");
         for (int i = 0; i < taille; i++) {
@@ -48,48 +59,35 @@ public class Interface {
             }
         }
 
-        // Vous pouvez éventuellement valider la grille avant de l'accepter
-        if (!sudoku.estValide()) {
-            System.out.println("La grille entrée est invalide (doublons détectés).");
-        } else {
-            System.out.println("Grille entrée avec succès.");
-        }
+        System.out.println("✅ Grille enregistrée avec succès !");
     }
 
     public void afficherGrille() {
-        Sudoku sudoku = creerSudoku();
+        if (sudoku == null) {
+            System.out.println("❌ Aucune grille disponible !");
+            return;
+        }
         sudoku.afficher();
     }
 
     public void resoudreSudoku() {
-        Sudoku sudoku = creerSudoku(); // Remplacer par la grille entrée par l'utilisateur
-        Solveur solveur = new Solveur(sudoku);
+        if (sudoku == null) {
+            System.out.println("❌ Aucune grille disponible !");
+            return;
+        }
 
-        System.out.println("\n1. Règles seulement\n2. Backtracking\n3. Mix des deux");
-        System.out.print("Choisissez la méthode : ");
-        int choix = scanner.nextInt();
-        boolean backtracking = choix == 2 || choix == 3;
+        System.out.println("\n✅ Résolution en cours...");
+        ReglesDeduction regles = new ReglesDeduction();
+        regles.appliquerToutesLesRegles(sudoku);
 
-        // Affichage des actions pendant la résolution
-        if (solveur.resoudre(backtracking)) {
-            System.out.println("\n✅ Grille résolue :");
+        if (sudoku.estRempli()) {
+            System.out.println("\n✅ Sudoku résolu !");
         } else {
-            System.out.println("❌ Impossible de résoudre cette grille.");
+            System.out.println("\n❌ Sudoku non résolu uniquement par déduction.");
         }
         sudoku.afficher();
     }
-
-    public Sudoku creerSudoku() {
-        // Cette méthode peut soit être utilisée pour la création d'une grille par défaut
-        // Soit vous pouvez l'adapter pour retourner la grille saisie précédemment
-        // Pour le moment, elle renvoie une grille vide 4x4 avec quelques valeurs par défaut.
-
-        char[] symboles = {'1', '2', '3', '4'};
-        Sudoku sudoku = new Sudoku(4, symboles);
-        sudoku.setCase(0, 0, '1');
-        sudoku.setCase(1, 1, '2');
-        sudoku.setCase(2, 2, '3');
-        sudoku.setCase(3, 3, '4');
-        return sudoku;
-    }
 }
+
+
+
